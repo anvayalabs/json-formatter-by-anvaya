@@ -13,7 +13,7 @@ import {
   RotateCcw, 
   Settings,
   Sun, 
-  Tree
+  Trees
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -155,7 +155,7 @@ const FormatterToolbar: React.FC<FormatterToolbarProps> = ({
                 disabled={!isJsonValid}
               >
                 {viewMode === "code" ? (
-                  <Tree className="h-4 w-4" />
+                  <Trees className="h-4 w-4" />
                 ) : (
                   <Code className="h-4 w-4" />
                 )}
