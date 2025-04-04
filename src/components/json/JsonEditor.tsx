@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect } from "react";
 import Editor from "@monaco-editor/react";
 import { Loader2 } from "lucide-react";
@@ -45,7 +46,7 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
       editor.focus();
     }
     
-    // Setup custom theme for dark mode
+    // Setup custom theme for dark mode with more granular color scheme
     monaco.editor.defineTheme('jsonDarkTheme', {
       base: 'vs-dark',
       inherit: true,
@@ -55,19 +56,34 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
         'editorCursor.foreground': '#f8f8f2',
         'editor.selectionBackground': '#44475a',
         'editor.lineHighlightBackground': '#2a2a3d',
+        'editor.findMatchBackground': '#6272a4',
+        'editor.findMatchHighlightBackground': '#6272a455',
+        'editorLineNumber.foreground': '#565869',
+        'editorLineNumber.activeForeground': '#bac2de',
+        'editorBracketMatch.background': '#363846',
+        'editorBracketMatch.border': '#9b87f5',
+        'editorIndentGuide.background': '#2a2a3d',
+        'editorIndentGuide.activeBackground': '#444455'
       },
       rules: [
-        { token: 'string', foreground: '#a3be8c' },
-        { token: 'number', foreground: '#f97316' },
-        { token: 'keyword', foreground: '#9b87f5' },
+        { token: 'string', foreground: '#a3be8c', fontStyle: 'italic' },
+        { token: 'string.key.json', foreground: '#1EAEDB', fontStyle: 'bold' },
+        { token: 'string.value.json', foreground: '#a3be8c', fontStyle: 'italic' },
+        { token: 'number', foreground: '#f97316', fontStyle: 'bold' },
+        { token: 'keyword', foreground: '#9b87f5', fontStyle: 'bold' },
         { token: 'delimiter', foreground: '#d4d4d4' },
-        { token: 'key', foreground: '#1EAEDB' },
-        { token: 'boolean', foreground: '#9b87f5' },
-        { token: 'null', foreground: '#8E9196' },
+        { token: 'delimiter.bracket', foreground: '#7E69AB' },
+        { token: 'delimiter.array', foreground: '#7E69AB' },
+        { token: 'delimiter.comma', foreground: '#888888' },
+        { token: 'delimiter.colon', foreground: '#0EA5E9', fontStyle: 'bold' },
+        { token: 'key', foreground: '#1EAEDB', fontStyle: 'bold' },
+        { token: 'key.json', foreground: '#1EAEDB', fontStyle: 'bold' },
+        { token: 'boolean', foreground: '#9b87f5', fontStyle: 'bold' },
+        { token: 'null', foreground: '#8E9196', fontStyle: 'bold italic' },
       ]
     });
     
-    // Setup custom theme for light mode
+    // Setup custom theme for light mode with more granular color scheme
     monaco.editor.defineTheme('jsonLightTheme', {
       base: 'vs',
       inherit: true,
@@ -77,15 +93,30 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
         'editorCursor.foreground': '#333333',
         'editor.selectionBackground': '#d1d1d1',
         'editor.lineHighlightBackground': '#f0f0f0',
+        'editor.findMatchBackground': '#b5d5ff',
+        'editor.findMatchHighlightBackground': '#b5d5ff88',
+        'editorLineNumber.foreground': '#aaaaaa',
+        'editorLineNumber.activeForeground': '#333333',
+        'editorBracketMatch.background': '#e8e8e8',
+        'editorBracketMatch.border': '#7E69AB',
+        'editorIndentGuide.background': '#e8e8e8',
+        'editorIndentGuide.activeBackground': '#cccccc'
       },
       rules: [
-        { token: 'string', foreground: '#388e3c' },
-        { token: 'number', foreground: '#e65100' },
-        { token: 'keyword', foreground: '#673ab7' },
+        { token: 'string', foreground: '#388e3c', fontStyle: 'italic' },
+        { token: 'string.key.json', foreground: '#0277bd', fontStyle: 'bold' },
+        { token: 'string.value.json', foreground: '#388e3c', fontStyle: 'italic' },
+        { token: 'number', foreground: '#e65100', fontStyle: 'bold' },
+        { token: 'keyword', foreground: '#673ab7', fontStyle: 'bold' },
         { token: 'delimiter', foreground: '#546e7a' },
-        { token: 'key', foreground: '#0277bd' },
-        { token: 'boolean', foreground: '#673ab7' },
-        { token: 'null', foreground: '#616161' },
+        { token: 'delimiter.bracket', foreground: '#7E69AB' },
+        { token: 'delimiter.array', foreground: '#7E69AB' },
+        { token: 'delimiter.comma', foreground: '#666666' },
+        { token: 'delimiter.colon', foreground: '#0277bd', fontStyle: 'bold' },
+        { token: 'key', foreground: '#0277bd', fontStyle: 'bold' },
+        { token: 'key.json', foreground: '#0277bd', fontStyle: 'bold' },
+        { token: 'boolean', foreground: '#673ab7', fontStyle: 'bold' },
+        { token: 'null', foreground: '#616161', fontStyle: 'bold italic' },
       ]
     });
     
