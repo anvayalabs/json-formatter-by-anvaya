@@ -2,6 +2,7 @@
 import React, { useRef, useEffect } from "react";
 import Editor from "@monaco-editor/react";
 import { Loader2 } from "lucide-react";
+import { useTheme } from "@/hooks/use-theme";
 
 interface JsonEditorProps {
   value: string;
@@ -10,6 +11,7 @@ interface JsonEditorProps {
   height?: string;
   error?: string | null;
   isLoading?: boolean;
+  preserveInput?: boolean;
 }
 
 const JsonEditor: React.FC<JsonEditorProps> = ({ 
@@ -18,9 +20,12 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
   readOnly = false, 
   height = "100%",
   error = null,
-  isLoading = false
+  isLoading = false,
+  preserveInput = false
 }) => {
   const editorRef = useRef<any>(null);
+  const { theme } = useTheme();
+  const isDarkTheme = theme === 'dark';
   
   const handleEditorDidMount = (editor: any, monaco: any) => {
     editorRef.current = editor;
@@ -33,6 +38,7 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
       smoothScrolling: true,
       cursorBlinking: "smooth",
       cursorSmoothCaretAnimation: "on",
+      wordWrap: "on",
     });
     
     // Focus the editor if it's not readonly
@@ -40,27 +46,67 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
       editor.focus();
     }
     
-    // Setup custom theme
-    monaco.editor.defineTheme('customTheme', {
+    // Setup custom theme for dark mode
+    monaco.editor.defineTheme('jsonDarkTheme', {
       base: 'vs-dark',
       inherit: true,
       colors: {
         'editor.background': '#1e1e2e',
+        'editor.foreground': '#f8f8f2',
+        'editorCursor.foreground': '#f8f8f2',
+        'editor.selectionBackground': '#44475a',
+        'editor.lineHighlightBackground': '#2a2a3d',
       },
       rules: [
         { token: 'string', foreground: '#a3be8c' },
         { token: 'number', foreground: '#f97316' },
-        { token: 'keyword', foreground: '#9b87f5' }
+        { token: 'keyword', foreground: '#9b87f5' },
+        { token: 'delimiter', foreground: '#d4d4d4' },
+        { token: 'key', foreground: '#1EAEDB' },
+        { token: 'boolean', foreground: '#9b87f5' },
+        { token: 'null', foreground: '#8E9196' },
       ]
     });
     
-    // Apply the theme
-    monaco.editor.setTheme('customTheme');
+    // Setup custom theme for light mode
+    monaco.editor.defineTheme('jsonLightTheme', {
+      base: 'vs',
+      inherit: true,
+      colors: {
+        'editor.background': '#f8f9fa',
+        'editor.foreground': '#333333',
+        'editorCursor.foreground': '#333333',
+        'editor.selectionBackground': '#d1d1d1',
+        'editor.lineHighlightBackground': '#f0f0f0',
+      },
+      rules: [
+        { token: 'string', foreground: '#388e3c' },
+        { token: 'number', foreground: '#e65100' },
+        { token: 'keyword', foreground: '#673ab7' },
+        { token: 'delimiter', foreground: '#546e7a' },
+        { token: 'key', foreground: '#0277bd' },
+        { token: 'boolean', foreground: '#673ab7' },
+        { token: 'null', foreground: '#616161' },
+      ]
+    });
+    
+    // Apply the theme based on current mode
+    monaco.editor.setTheme(isDarkTheme ? 'jsonDarkTheme' : 'jsonLightTheme');
   };
 
+  // Update theme when it changes
+  useEffect(() => {
+    if (editorRef.current) {
+      const monaco = editorRef.current.getModel()?.getLanguageId ? window.monaco : null;
+      if (monaco) {
+        monaco.editor.setTheme(isDarkTheme ? 'jsonDarkTheme' : 'jsonLightTheme');
+      }
+    }
+  }, [theme, isDarkTheme]);
+
+  // Handle error highlighting
   useEffect(() => {
     if (editorRef.current && error) {
-      // Monaco editor has APIs to highlight errors, but we're keeping it simple for now
       // In a future version, we could mark the exact location of the error
     }
   }, [error]);
@@ -78,7 +124,7 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
       <Editor
         height={height}
         language="json"
-        theme="vs-dark"
+        theme={isDarkTheme ? "jsonDarkTheme" : "jsonLightTheme"}
         value={value}
         options={{
           readOnly,
@@ -90,7 +136,7 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
           fontSize: 14,
           wordWrap: "on",
           automaticLayout: true,
-          formatOnPaste: true,
+          formatOnPaste: preserveInput ? false : true,
           tabSize: 2,
           folding: true,
           bracketPairColorization: {

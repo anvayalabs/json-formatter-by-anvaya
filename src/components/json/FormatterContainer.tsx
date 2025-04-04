@@ -11,7 +11,11 @@ import { useToast } from "@/hooks/use-toast";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
-import { ChevronUp, ChevronDown, Share2, Upload, FileWarning } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { ChevronUp, ChevronDown, Share2, Upload, FileWarning, Copy, Check } from "lucide-react";
+import { useTheme } from "@/hooks/use-theme";
 
 interface FormatterContainerProps {
   // Add any props that might be needed in the future
@@ -23,6 +27,17 @@ interface SettingsType {
   autoUpdate: boolean;
   colorMode: 'light' | 'dark' | 'system';
   viewMode: 'code' | 'tree';
+  preserveWhitespace: boolean;
+  sortKeys: boolean;
+  wordWrap: boolean;
+  showLineNumbers: boolean;
+  highlightMatchingBrackets: boolean;
+}
+
+// Define a type for exported settings
+interface ExportedSettings extends SettingsType {
+  timestamp: number;
+  version: string;
 }
 
 const SAMPLE_JSON = `{
@@ -84,8 +99,8 @@ const FormatterContainer: React.FC<FormatterContainerProps> = () => {
   // State for auto update
   const [autoUpdate, setAutoUpdate] = useLocalStorage<boolean>("json-formatter-auto-update", true);
   
-  // State for color mode
-  const [colorMode, setColorMode] = useLocalStorage<"light" | "dark" | "system">("json-formatter-color-mode", "system");
+  // Use theme hook instead of local state
+  const { theme: colorMode, setTheme: setColorMode } = useTheme();
   
   // State for minify mode
   const [isMinified, setIsMinified] = useState(false);
@@ -98,27 +113,26 @@ const FormatterContainer: React.FC<FormatterContainerProps> = () => {
 
   // State for settings dialog
   const [settingsOpen, setSettingsOpen] = useState(false);
-
+  
+  // State for share dialog
+  const [shareOpen, setShareOpen] = useState(false);
+  const [shareUrl, setShareUrl] = useState("");
+  const [isUrlCopied, setIsUrlCopied] = useState(false);
+  
   // State for collapsible uploader
   const [uploaderOpen, setUploaderOpen] = useState(false);
+  
+  // Advanced settings
+  const [preserveWhitespace, setPreserveWhitespace] = useLocalStorage<boolean>("json-formatter-preserve-whitespace", false);
+  const [sortKeys, setSortKeys] = useLocalStorage<boolean>("json-formatter-sort-keys", false);
+  const [wordWrap, setWordWrap] = useLocalStorage<boolean>("json-formatter-word-wrap", true);
+  const [showLineNumbers, setShowLineNumbers] = useLocalStorage<boolean>("json-formatter-show-line-numbers", true);
+  const [highlightMatchingBrackets, setHighlightMatchingBrackets] = useLocalStorage<boolean>("json-formatter-highlight-matching", true);
 
   const { toast } = useToast();
-
-  // Effect for handling color mode
-  useEffect(() => {
-    const root = window.document.documentElement;
-    
-    if (colorMode === "system") {
-      const systemPreference = window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? "dark"
-        : "light";
-      root.classList.remove("light", "dark");
-      root.classList.add(systemPreference);
-    } else {
-      root.classList.remove("light", "dark");
-      root.classList.add(colorMode);
-    }
-  }, [colorMode]);
+  
+  // Timer ref for auto-update delay
+  const autoUpdateTimer = useRef<NodeJS.Timeout | null>(null);
 
   // Function to parse and validate JSON
   const parseJson = useCallback((input: string): any => {
@@ -146,6 +160,27 @@ const FormatterContainer: React.FC<FormatterContainerProps> = () => {
     try {
       if (parsed === null) return "";
       
+      // Sort keys if enabled
+      if (sortKeys) {
+        const sortObjectKeys = (obj: any): any => {
+          if (obj === null) return null;
+          if (typeof obj !== 'object') return obj;
+          
+          if (Array.isArray(obj)) {
+            return obj.map(item => sortObjectKeys(item));
+          }
+          
+          return Object.keys(obj)
+            .sort()
+            .reduce((result: any, key) => {
+              result[key] = sortObjectKeys(obj[key]);
+              return result;
+            }, {});
+        };
+        
+        parsed = sortObjectKeys(parsed);
+      }
+      
       const formatted = JSON.stringify(parsed, null, spaces);
       setIsMinified(false);
       return formatted;
@@ -154,7 +189,7 @@ const FormatterContainer: React.FC<FormatterContainerProps> = () => {
       setError(errorMessage);
       return "";
     }
-  }, []);
+  }, [sortKeys]);
 
   // Function to minify JSON
   const minifyJson = useCallback((parsed: any) => {
@@ -175,7 +210,13 @@ const FormatterContainer: React.FC<FormatterContainerProps> = () => {
   useEffect(() => {
     if (!autoUpdate) return;
     
-    const timer = setTimeout(() => {
+    // Clear previous timer
+    if (autoUpdateTimer.current) {
+      clearTimeout(autoUpdateTimer.current);
+    }
+    
+    // Set new timer for auto-update
+    autoUpdateTimer.current = setTimeout(() => {
       setIsLoading(true);
       try {
         const parsed = parseJson(jsonInput);
@@ -184,13 +225,19 @@ const FormatterContainer: React.FC<FormatterContainerProps> = () => {
         if (parsed !== null) {
           const formatted = formatJson(parsed, indentation);
           setJsonOutput(formatted);
+        } else {
+          setJsonOutput("");
         }
       } finally {
         setIsLoading(false);
       }
     }, 300);
     
-    return () => clearTimeout(timer);
+    return () => {
+      if (autoUpdateTimer.current) {
+        clearTimeout(autoUpdateTimer.current);
+      }
+    };
   }, [jsonInput, indentation, autoUpdate, parseJson, formatJson]);
 
   // Handle format button click
@@ -203,6 +250,8 @@ const FormatterContainer: React.FC<FormatterContainerProps> = () => {
       if (parsed !== null) {
         const formatted = formatJson(parsed, indentation);
         setJsonOutput(formatted);
+      } else {
+        setJsonOutput("");
       }
     } finally {
       setIsLoading(false);
@@ -219,6 +268,8 @@ const FormatterContainer: React.FC<FormatterContainerProps> = () => {
       if (parsed !== null) {
         const minified = minifyJson(parsed);
         setJsonOutput(minified);
+      } else {
+        setJsonOutput("");
       }
     } finally {
       setIsLoading(false);
@@ -314,6 +365,164 @@ const FormatterContainer: React.FC<FormatterContainerProps> = () => {
       description: "Your JSON file has been loaded successfully"
     });
   };
+  
+  // Handle share functionality
+  const handleShare = () => {
+    try {
+      if (!isJsonValid) {
+        toast({
+          variant: "destructive",
+          title: "Invalid JSON",
+          description: "Please fix the JSON errors before sharing"
+        });
+        return;
+      }
+      
+      // In a real app, you'd generate a server-side URL or use a service
+      // For now, we'll create a data URI that can be shared
+      const jsonData = jsonOutput || jsonInput;
+      const encodedJson = encodeURIComponent(jsonData);
+      const dataUrl = `data:text/json;charset=utf-8,${encodedJson}`;
+      
+      // In a production environment, you'd use a URL shortener service
+      // For now, we'll just show this data URL
+      setShareUrl(dataUrl);
+      setIsUrlCopied(false);
+      setShareOpen(true);
+    } catch (e) {
+      toast({
+        variant: "destructive",
+        title: "Share Error",
+        description: "Could not generate shareable link"
+      });
+    }
+  };
+  
+  const copyShareUrl = () => {
+    navigator.clipboard.writeText(shareUrl).then(
+      () => {
+        setIsUrlCopied(true);
+        setTimeout(() => setIsUrlCopied(false), 2000);
+      },
+      (err) => {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to copy link"
+        });
+      }
+    );
+  };
+
+  // Export settings function
+  const exportSettings = () => {
+    try {
+      const settingsToExport: ExportedSettings = {
+        indentation,
+        autoUpdate,
+        colorMode: colorMode as 'light' | 'dark' | 'system',
+        viewMode,
+        preserveWhitespace,
+        sortKeys,
+        wordWrap,
+        showLineNumbers,
+        highlightMatchingBrackets,
+        timestamp: Date.now(),
+        version: '1.0.0'
+      };
+      
+      const settingsJson = JSON.stringify(settingsToExport, null, 2);
+      const blob = new Blob([settingsJson], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "json-formatter-settings.json";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      toast({
+        title: "Settings Exported",
+        description: "Your settings have been saved to a file"
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Export Failed",
+        description: "Could not export settings"
+      });
+    }
+  };
+  
+  // Import settings function
+  const importSettings = (event: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const content = e.target?.result as string;
+          const importedSettings: ExportedSettings = JSON.parse(content);
+          
+          // Update all settings
+          setIndentation(importedSettings.indentation || 2);
+          setAutoUpdate(importedSettings.autoUpdate ?? true);
+          setColorMode(importedSettings.colorMode || 'system');
+          setViewMode(importedSettings.viewMode || 'code');
+          setPreserveWhitespace(importedSettings.preserveWhitespace ?? false);
+          setSortKeys(importedSettings.sortKeys ?? false);
+          setWordWrap(importedSettings.wordWrap ?? true);
+          setShowLineNumbers(importedSettings.showLineNumbers ?? true);
+          setHighlightMatchingBrackets(importedSettings.highlightMatchingBrackets ?? true);
+          
+          toast({
+            title: "Settings Imported",
+            description: "Your settings have been successfully imported"
+          });
+        } catch (error) {
+          toast({
+            variant: "destructive",
+            title: "Import Failed",
+            description: "The imported file is not valid settings file"
+          });
+        }
+      };
+      
+      reader.readAsText(file);
+      
+      // Reset the file input
+      event.target.value = '';
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Import Failed",
+        description: "Could not import settings"
+      });
+    }
+  };
+  
+  // Clear local storage
+  const clearLocalStorage = () => {
+    try {
+      localStorage.clear();
+      toast({
+        title: "Local Storage Cleared",
+        description: "All stored settings have been reset to defaults"
+      });
+      
+      // Reload the page to reset all states
+      window.location.reload();
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Operation Failed",
+        description: "Could not clear local storage"
+      });
+    }
+  };
 
   // Handle setting changes
   const handleSettingChange = <K extends keyof SettingsType>(
@@ -333,6 +542,21 @@ const FormatterContainer: React.FC<FormatterContainerProps> = () => {
       case 'viewMode':
         setViewMode(value as "code" | "tree");
         break;
+      case 'preserveWhitespace':
+        setPreserveWhitespace(value as boolean);
+        break;
+      case 'sortKeys':
+        setSortKeys(value as boolean);
+        break;
+      case 'wordWrap':
+        setWordWrap(value as boolean);
+        break;
+      case 'showLineNumbers':
+        setShowLineNumbers(value as boolean);
+        break;
+      case 'highlightMatchingBrackets':
+        setHighlightMatchingBrackets(value as boolean);
+        break;
     }
   };
 
@@ -340,19 +564,18 @@ const FormatterContainer: React.FC<FormatterContainerProps> = () => {
   const settings: SettingsType = {
     indentation,
     autoUpdate,
-    colorMode,
+    colorMode: colorMode as 'light' | 'dark' | 'system',
     viewMode,
+    preserveWhitespace,
+    sortKeys,
+    wordWrap,
+    showLineNumbers,
+    highlightMatchingBrackets,
   };
-
-  // Share JSON functionality
-  const handleShare = () => {
-    // In a real app, this could generate a shareable URL
-    toast({
-      title: "Share Feature",
-      description: "Shareable link feature would be implemented here"
-    });
-  };
-
+  
+  // Hidden file input for settings import
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
   // Determine if layout should be horizontal or vertical (for mobile)
   const isMobile = window.innerWidth < 768;
 
@@ -373,12 +596,13 @@ const FormatterContainer: React.FC<FormatterContainerProps> = () => {
         autoUpdate={autoUpdate}
         onAutoUpdateChange={setAutoUpdate}
         isJsonValid={isJsonValid}
-        colorMode={colorMode}
+        colorMode={colorMode as 'light' | 'dark' | 'system'}
         onColorModeChange={setColorMode}
         isMinified={isMinified}
         isExpanded={isExpanded}
         onExpandToggle={() => setIsExpanded(!isExpanded)}
         onSettingsOpen={() => setSettingsOpen(true)}
+        onShare={handleShare}
       />
 
       <div className="flex items-center justify-between p-2 px-3 bg-muted/30">
@@ -432,6 +656,7 @@ const FormatterContainer: React.FC<FormatterContainerProps> = () => {
                 onChange={setJsonInput}
                 error={error}
                 isLoading={isLoading}
+                preserveInput={true}
               />
             </Card>
           </ResizablePanel>
@@ -466,6 +691,50 @@ const FormatterContainer: React.FC<FormatterContainerProps> = () => {
         onOpenChange={setSettingsOpen}
         settings={settings}
         onSettingChange={handleSettingChange}
+        onExportSettings={exportSettings}
+        onImportSettings={() => fileInputRef.current?.click()}
+        onClearLocalStorage={clearLocalStorage}
+      />
+      
+      {/* Share Dialog */}
+      <Dialog open={shareOpen} onOpenChange={setShareOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Share JSON</DialogTitle>
+            <DialogDescription>
+              Anyone with this link can view your JSON data.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex items-center space-x-2">
+            <div className="grid flex-1 gap-2">
+              <Label htmlFor="link" className="sr-only">Link</Label>
+              <Input
+                id="link"
+                defaultValue={shareUrl}
+                readOnly
+                className="w-full"
+              />
+            </div>
+            <Button type="submit" size="sm" className="px-3" onClick={copyShareUrl}>
+              {isUrlCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+              <span className="sr-only">Copy</span>
+            </Button>
+          </div>
+          <DialogClose asChild>
+            <Button type="button" variant="secondary">
+              Close
+            </Button>
+          </DialogClose>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Hidden file input for settings import */}
+      <input 
+        type="file" 
+        ref={fileInputRef}
+        style={{ display: 'none' }}
+        accept=".json"
+        onChange={importSettings}
       />
     </div>
   );

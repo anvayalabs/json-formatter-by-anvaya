@@ -37,6 +37,7 @@ interface FormatterToolbarProps {
   onCopy: () => void;
   onDownload: () => void;
   onPrint: () => void;
+  onShare: () => void;
   isLoading: boolean;
   indentation: number;
   onIndentationChange: (value: number) => void;
@@ -60,6 +61,7 @@ const FormatterToolbar: React.FC<FormatterToolbarProps> = ({
   onCopy,
   onDownload,
   onPrint,
+  onShare,
   isLoading,
   indentation,
   onIndentationChange,
@@ -288,6 +290,25 @@ const FormatterToolbar: React.FC<FormatterToolbarProps> = ({
             </Tooltip>
           </TooltipProvider>
         )}
+        
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onShare}
+                disabled={!isJsonValid}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <Share2 className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Share JSON</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
 
         <TooltipProvider>
           <Tooltip>

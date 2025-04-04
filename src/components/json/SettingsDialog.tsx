@@ -15,6 +15,11 @@ interface SettingsType {
   autoUpdate: boolean;
   colorMode: 'light' | 'dark' | 'system';
   viewMode: 'code' | 'tree';
+  preserveWhitespace: boolean;
+  sortKeys: boolean;
+  wordWrap: boolean;
+  showLineNumbers: boolean;
+  highlightMatchingBrackets: boolean;
 }
 
 interface SettingsDialogProps {
@@ -25,6 +30,9 @@ interface SettingsDialogProps {
     key: K,
     value: SettingsType[K]
   ) => void;
+  onExportSettings: () => void;
+  onImportSettings: () => void;
+  onClearLocalStorage: () => void;
 }
 
 const SettingsDialog: React.FC<SettingsDialogProps> = ({
@@ -32,6 +40,9 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({
   onOpenChange,
   settings,
   onSettingChange,
+  onExportSettings,
+  onImportSettings,
+  onClearLocalStorage
 }) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -160,15 +171,27 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({
                 <div className="grid gap-4">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="show-line-numbers">Show line numbers</Label>
-                    <Switch id="show-line-numbers" defaultChecked />
+                    <Switch 
+                      id="show-line-numbers" 
+                      checked={settings.showLineNumbers}
+                      onCheckedChange={(value) => onSettingChange('showLineNumbers', value)}
+                    />
                   </div>
                   <div className="flex items-center justify-between">
                     <Label htmlFor="word-wrap">Word wrap</Label>
-                    <Switch id="word-wrap" defaultChecked />
+                    <Switch 
+                      id="word-wrap" 
+                      checked={settings.wordWrap}
+                      onCheckedChange={(value) => onSettingChange('wordWrap', value)}
+                    />
                   </div>
                   <div className="flex items-center justify-between">
                     <Label htmlFor="highlight-matching">Highlight matching brackets</Label>
-                    <Switch id="highlight-matching" defaultChecked />
+                    <Switch 
+                      id="highlight-matching" 
+                      checked={settings.highlightMatchingBrackets}
+                      onCheckedChange={(value) => onSettingChange('highlightMatchingBrackets', value)}
+                    />
                   </div>
                 </div>
               </div>
@@ -185,7 +208,11 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({
                         Keep custom whitespace when formatting
                       </p>
                     </div>
-                    <Switch id="preserve-whitespace" />
+                    <Switch 
+                      id="preserve-whitespace" 
+                      checked={settings.preserveWhitespace}
+                      onCheckedChange={(value) => onSettingChange('preserveWhitespace', value)}
+                    />
                   </div>
                   <div className="flex items-center justify-between">
                     <div>
@@ -194,7 +221,11 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({
                         Alphabetically sort keys when formatting
                       </p>
                     </div>
-                    <Switch id="sort-keys" />
+                    <Switch 
+                      id="sort-keys" 
+                      checked={settings.sortKeys}
+                      onCheckedChange={(value) => onSettingChange('sortKeys', value)}
+                    />
                   </div>
                 </div>
               </div>
@@ -204,16 +235,16 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({
               <div className="space-y-3">
                 <h4 className="text-sm font-medium">Data Management</h4>
                 <div className="flex justify-between space-x-2">
-                  <Button variant="outline" size="sm" className="w-full">
+                  <Button variant="outline" size="sm" className="w-full" onClick={onExportSettings}>
                     <Download className="h-4 w-4 mr-2" />
                     Export Settings
                   </Button>
-                  <Button variant="outline" size="sm" className="w-full">
+                  <Button variant="outline" size="sm" className="w-full" onClick={onImportSettings}>
                     <ArrowUpDown className="h-4 w-4 mr-2" />
                     Import Settings
                   </Button>
                 </div>
-                <Button variant="destructive" size="sm" className="w-full">
+                <Button variant="destructive" size="sm" className="w-full" onClick={onClearLocalStorage}>
                   Clear Local Storage
                 </Button>
               </div>
