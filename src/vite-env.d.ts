@@ -8,3 +8,4 @@ declare global {
   }
 }
 
+export {}; // This export makes the file a module, enabling the global augmentation

@@ -95,12 +95,8 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
 
   // Update theme when it changes
   useEffect(() => {
-    if (editorRef.current) {
-      const editorModel = editorRef.current.getModel();
-      const monaco = editorModel?.getLanguageId ? window.monaco : null;
-      if (monaco) {
-        monaco.editor.setTheme(isDarkTheme ? 'jsonDarkTheme' : 'jsonLightTheme');
-      }
+    if (editorRef.current && window.monaco) {
+      window.monaco.editor.setTheme(isDarkTheme ? 'jsonDarkTheme' : 'jsonLightTheme');
     }
   }, [theme, isDarkTheme]);
 
