@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect } from "react";
 import Editor from "@monaco-editor/react";
 import { Loader2 } from "lucide-react";
@@ -97,7 +96,8 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
   // Update theme when it changes
   useEffect(() => {
     if (editorRef.current) {
-      const monaco = editorRef.current.getModel()?.getLanguageId ? window.monaco : null;
+      const editorModel = editorRef.current.getModel();
+      const monaco = editorModel?.getLanguageId ? window.monaco : null;
       if (monaco) {
         monaco.editor.setTheme(isDarkTheme ? 'jsonDarkTheme' : 'jsonLightTheme');
       }
