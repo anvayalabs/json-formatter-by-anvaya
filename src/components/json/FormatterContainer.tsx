@@ -41,37 +41,7 @@ interface ExportedSettings extends SettingsType {
 }
 
 const SAMPLE_JSON = `{
-  "name": "Anvaya Labs",
-  "type": "Organization",
-  "founded": 2020,
-  "isActive": true,
-  "employees": 25,
-  "location": {
-    "city": "San Francisco",
-    "state": "California",
-    "country": "USA"
-  },
-  "products": [
-    {
-      "id": 1,
-      "name": "JSON Formatter",
-      "version": "1.0.0",
-      "features": ["formatting", "validation", "beautify", "minify"]
-    },
-    {
-      "id": 2,
-      "name": "API Tester",
-      "version": "0.9.0",
-      "features": ["request", "response", "headers", "auth"]
-    }
-  ],
-  "social": {
-    "twitter": "@anvayalabs",
-    "github": "github.com/anvayalabs",
-    "website": "https://anvaya.com"
-  },
-  "logo": "https://placehold.co/400",
-  "nullValue": null
+  "task": "Input your JSON here"
 }`;
 
 const FormatterContainer: React.FC<FormatterContainerProps> = () => {
