@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { 
   Code, 
@@ -320,22 +319,15 @@ const FormatterToolbar: React.FC<FormatterToolbarProps> = ({
                   onColorModeChange(
                     colorMode === "light" 
                       ? "dark" 
-                      : colorMode === "dark" 
-                        ? "system" 
-                        : "light"
+                      : "light"
                   );
                 }}
                 className="text-muted-foreground hover:text-foreground"
               >
                 {colorMode === "light" ? (
                   <Sun className="h-4 w-4" />
-                ) : colorMode === "dark" ? (
-                  <Moon className="h-4 w-4" />
                 ) : (
-                  <div className="relative h-4 w-4">
-                    <Sun className="h-4 w-4 absolute top-0 left-0" />
-                    <Moon className="h-4 w-4 absolute -bottom-1 -right-1 scale-75" />
-                  </div>
+                  <Moon className="h-4 w-4" />
                 )}
               </Button>
             </TooltipTrigger>
@@ -343,9 +335,7 @@ const FormatterToolbar: React.FC<FormatterToolbarProps> = ({
               <p>
                 {colorMode === "light" 
                   ? "Switch to Dark Mode" 
-                  : colorMode === "dark" 
-                    ? "Switch to System Preference" 
-                    : "Switch to Light Mode"
+                  : "Switch to Light Mode"
                 }
               </p>
             </TooltipContent>

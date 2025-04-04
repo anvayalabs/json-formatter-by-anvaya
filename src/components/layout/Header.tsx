@@ -7,9 +7,11 @@ const Header: React.FC = () => {
   return (
     <header className="bg-background border-b px-4 py-2 flex items-center justify-between">
       <div className="flex items-center">
-        <h1 className="text-xl font-bold">
+        <h1 className="text-xl font-bold flex items-center">
           <span className="bg-gradient-to-r from-[#1EAEDB] to-[#9b87f5] bg-clip-text text-transparent">Anvaya</span>
-          <span className="text-foreground"> JSON Formatter</span>
+          <span className="text-foreground ml-1">Labs</span>
+          <span className="text-foreground mx-2">|</span>
+          <span className="text-foreground">JSON Formatter</span>
         </h1>
       </div>
       <div className="flex items-center space-x-2">

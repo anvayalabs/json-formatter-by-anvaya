@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Settings, HelpCircle, Share2, Download, Save, Code, FileJson, ArrowUpDown } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -13,7 +12,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 interface SettingsType {
   indentation: number;
   autoUpdate: boolean;
-  colorMode: 'light' | 'dark' | 'system';
+  colorMode: 'light' | 'dark';
   viewMode: 'code' | 'tree';
   preserveWhitespace: boolean;
   sortKeys: boolean;
@@ -146,7 +145,7 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({
                 <RadioGroup
                   value={settings.colorMode}
                   onValueChange={(value) => 
-                    onSettingChange('colorMode', value as 'light' | 'dark' | 'system')
+                    onSettingChange('colorMode', value as 'light' | 'dark')
                   }
                 >
                   <div className="flex items-center space-x-2">
@@ -156,10 +155,6 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({
                   <div className="flex items-center space-x-2 mt-2">
                     <RadioGroupItem value="dark" id="theme-dark" />
                     <Label htmlFor="theme-dark">Dark Mode</Label>
-                  </div>
-                  <div className="flex items-center space-x-2 mt-2">
-                    <RadioGroupItem value="system" id="theme-system" />
-                    <Label htmlFor="theme-system">System Preference</Label>
                   </div>
                 </RadioGroup>
               </div>
