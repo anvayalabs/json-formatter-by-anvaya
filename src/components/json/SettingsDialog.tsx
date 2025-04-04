@@ -10,18 +10,20 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
+interface SettingsType {
+  indentation: number;
+  autoUpdate: boolean;
+  colorMode: 'light' | 'dark' | 'system';
+  viewMode: 'code' | 'tree';
+}
+
 interface SettingsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  settings: {
-    indentation: number;
-    autoUpdate: boolean;
-    colorMode: 'light' | 'dark' | 'system';
-    viewMode: 'code' | 'tree';
-  };
-  onSettingChange: <K extends keyof typeof settings>(
+  settings: SettingsType;
+  onSettingChange: <K extends keyof SettingsType>(
     key: K,
-    value: typeof settings[K]
+    value: SettingsType[K]
   ) => void;
 }
 

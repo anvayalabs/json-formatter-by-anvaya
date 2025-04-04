@@ -17,6 +17,14 @@ interface FormatterContainerProps {
   // Add any props that might be needed in the future
 }
 
+// Define the SettingsType interface to be consistent with SettingsDialog
+interface SettingsType {
+  indentation: number;
+  autoUpdate: boolean;
+  colorMode: 'light' | 'dark' | 'system';
+  viewMode: 'code' | 'tree';
+}
+
 const SAMPLE_JSON = `{
   "name": "Anvaya Labs",
   "type": "Organization",
@@ -308,9 +316,9 @@ const FormatterContainer: React.FC<FormatterContainerProps> = () => {
   };
 
   // Handle setting changes
-  const handleSettingChange = <K extends keyof typeof settings>(
+  const handleSettingChange = <K extends keyof SettingsType>(
     key: K,
-    value: typeof settings[K]
+    value: SettingsType[K]
   ) => {
     switch (key) {
       case 'indentation':
@@ -329,7 +337,7 @@ const FormatterContainer: React.FC<FormatterContainerProps> = () => {
   };
 
   // Settings object for the dialog
-  const settings = {
+  const settings: SettingsType = {
     indentation,
     autoUpdate,
     colorMode,
