@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { 
   Code, 
   Copy, 
@@ -13,7 +13,10 @@ import {
   RotateCcw, 
   Settings,
   Sun, 
-  Trees
+  Trees,
+  Files,
+  Share2,
+  Sparkles
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -21,6 +24,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { 
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 interface FormatterToolbarProps {
   onFormat: () => void;
@@ -42,6 +50,7 @@ interface FormatterToolbarProps {
   isMinified: boolean;
   isExpanded: boolean;
   onExpandToggle: () => void;
+  onSettingsOpen?: () => void;
 }
 
 const FormatterToolbar: React.FC<FormatterToolbarProps> = ({
@@ -63,9 +72,11 @@ const FormatterToolbar: React.FC<FormatterToolbarProps> = ({
   onColorModeChange,
   isMinified,
   isExpanded,
-  onExpandToggle
+  onExpandToggle,
+  onSettingsOpen
 }) => {
   const { toast } = useToast();
+  const [showTools, setShowTools] = useState(false);
   
   const handleIndentationChange = (value: string) => {
     onIndentationChange(Number(value));
@@ -75,23 +86,30 @@ const FormatterToolbar: React.FC<FormatterToolbarProps> = ({
   const isMobile = window.innerWidth < 768;
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-2 p-2 border-b">
+    <div className="flex flex-wrap items-center justify-between gap-2 p-2 bg-card border-b sticky top-0 z-10">
       <div className="flex items-center space-x-2">
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
               <Button 
-                variant="outline" 
+                variant={isMinified ? "default" : "outline"}
                 size="sm" 
                 onClick={isMinified ? onFormat : onMinify}
                 disabled={isLoading || !isJsonValid}
+                className="transition-all"
               >
                 {isLoading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : isMinified ? (
-                  <span className="text-xs">Beautify</span>
+                  <div className="flex items-center gap-1">
+                    <Sparkles className="h-3.5 w-3.5" />
+                    <span className="text-xs">Beautify</span>
+                  </div>
                 ) : (
-                  <span className="text-xs">Minify</span>
+                  <div className="flex items-center gap-1">
+                    <Files className="h-3.5 w-3.5" />
+                    <span className="text-xs">Minify</span>
+                  </div>
                 )}
               </Button>
             </TooltipTrigger>
@@ -108,43 +126,64 @@ const FormatterToolbar: React.FC<FormatterToolbarProps> = ({
                 variant="outline" 
                 size="sm" 
                 onClick={onClear}
+                className="transition-all hover:bg-destructive/10"
               >
                 <RotateCcw className="h-4 w-4" />
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              <p>Clear</p>
+              <p>Clear Editor</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
 
         {!isMobile && (
-          <Select value={indentation.toString()} onValueChange={handleIndentationChange}>
-            <SelectTrigger className="w-[130px] h-8">
-              <SelectValue placeholder="Indent: 2 spaces" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="2">Indent: 2 spaces</SelectItem>
-              <SelectItem value="3">Indent: 3 spaces</SelectItem>
-              <SelectItem value="4">Indent: 4 spaces</SelectItem>
-              <SelectItem value="8">Indent: 8 spaces</SelectItem>
-            </SelectContent>
-          </Select>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button 
+                variant="outline"
+                size="sm"
+                className="h-8 bg-background hover:bg-background/80"
+              >
+                <span className="mr-1">Spaces:</span>
+                <span className="font-mono">{indentation}</span>
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-48 p-2">
+              <div className="space-y-2">
+                <div className="text-sm font-medium">Indentation</div>
+                <div className="grid grid-cols-4 gap-2">
+                  {[2, 3, 4, 8].map((value) => (
+                    <Button 
+                      key={value}
+                      variant={indentation === value ? "default" : "outline"}
+                      size="sm"
+                      className="w-full font-mono"
+                      onClick={() => handleIndentationChange(value.toString())}
+                    >
+                      {value}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
         )}
-      </div>
 
-      <div className="flex items-center space-x-2">
         {!isMobile && (
-          <div className="flex items-center space-x-2">
-            <Label htmlFor="auto-update" className="text-xs">Auto Update</Label>
+          <div className="flex items-center space-x-2 ml-2">
             <Switch
               id="auto-update"
               checked={autoUpdate}
               onCheckedChange={onAutoUpdateChange}
+              className="data-[state=checked]:bg-emerald-500"
             />
+            <Label htmlFor="auto-update" className="text-xs cursor-pointer">Auto Update</Label>
           </div>
         )}
+      </div>
 
+      <div className="flex items-center space-x-2">
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -153,6 +192,7 @@ const FormatterToolbar: React.FC<FormatterToolbarProps> = ({
                 size="sm"
                 onClick={() => onViewModeChange(viewMode === "code" ? "tree" : "code")}
                 disabled={!isJsonValid}
+                className="text-muted-foreground hover:text-foreground"
               >
                 {viewMode === "code" ? (
                   <Trees className="h-4 w-4" />
@@ -175,6 +215,7 @@ const FormatterToolbar: React.FC<FormatterToolbarProps> = ({
                 size="sm"
                 onClick={onExpandToggle}
                 disabled={viewMode !== "tree" || !isJsonValid}
+                className="text-muted-foreground hover:text-foreground"
               >
                 {isExpanded ? (
                   <Minimize2 className="h-4 w-4" />
@@ -197,6 +238,7 @@ const FormatterToolbar: React.FC<FormatterToolbarProps> = ({
                 size="sm"
                 onClick={onCopy}
                 disabled={!isJsonValid}
+                className="text-muted-foreground hover:text-foreground"
               >
                 <Copy className="h-4 w-4" />
               </Button>
@@ -215,6 +257,7 @@ const FormatterToolbar: React.FC<FormatterToolbarProps> = ({
                 size="sm"
                 onClick={onDownload}
                 disabled={!isJsonValid}
+                className="text-muted-foreground hover:text-foreground"
               >
                 <FileDown className="h-4 w-4" />
               </Button>
@@ -234,6 +277,7 @@ const FormatterToolbar: React.FC<FormatterToolbarProps> = ({
                   size="sm"
                   onClick={onPrint}
                   disabled={!isJsonValid}
+                  className="text-muted-foreground hover:text-foreground"
                 >
                   <Printer className="h-4 w-4" />
                 </Button>
@@ -260,6 +304,7 @@ const FormatterToolbar: React.FC<FormatterToolbarProps> = ({
                         : "light"
                   );
                 }}
+                className="text-muted-foreground hover:text-foreground"
               >
                 {colorMode === "light" ? (
                   <Sun className="h-4 w-4" />
@@ -285,6 +330,26 @@ const FormatterToolbar: React.FC<FormatterToolbarProps> = ({
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
+        
+        {onSettingsOpen && (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={onSettingsOpen}
+                  className="ml-2"
+                >
+                  <Settings className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Advanced Settings</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
       </div>
     </div>
   );

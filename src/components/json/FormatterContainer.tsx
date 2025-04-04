@@ -1,13 +1,17 @@
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import JsonEditor from "./JsonEditor";
 import JsonTreeView from "./JsonTreeView";
 import FormatterToolbar from "./FormatterToolbar";
 import JsonUploader from "./JsonUploader";
+import SettingsDialog from "./SettingsDialog";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useLocalStorage } from "@/hooks/use-local-storage";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Button } from "@/components/ui/button";
+import { ChevronUp, ChevronDown, Share2, Upload, FileWarning } from "lucide-react";
 
 interface FormatterContainerProps {
   // Add any props that might be needed in the future
@@ -83,6 +87,12 @@ const FormatterContainer: React.FC<FormatterContainerProps> = () => {
 
   // State tracking if JSON is valid
   const [isJsonValid, setIsJsonValid] = useState(true);
+
+  // State for settings dialog
+  const [settingsOpen, setSettingsOpen] = useState(false);
+
+  // State for collapsible uploader
+  const [uploaderOpen, setUploaderOpen] = useState(false);
 
   const { toast } = useToast();
 
@@ -245,6 +255,11 @@ const FormatterContainer: React.FC<FormatterContainerProps> = () => {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+    
+    toast({
+      title: "JSON Downloaded",
+      description: "Your JSON file has been downloaded successfully"
+    });
   };
 
   // Handle print button click
@@ -256,7 +271,20 @@ const FormatterContainer: React.FC<FormatterContainerProps> = () => {
           <head>
             <title>JSON Print</title>
             <style>
-              body { font-family: monospace; white-space: pre; padding: 20px; }
+              body { 
+                font-family: monospace; 
+                white-space: pre; 
+                padding: 20px;
+                background-color: ${colorMode === 'dark' ? '#1e1e1e' : 'white'};
+                color: ${colorMode === 'dark' ? '#d4d4d4' : 'black'};
+              }
+              @media print {
+                body { 
+                  font-size: 12pt;
+                  color: black;
+                  background-color: white;
+                }
+              }
             </style>
           </head>
           <body>
@@ -272,6 +300,49 @@ const FormatterContainer: React.FC<FormatterContainerProps> = () => {
   // Handle file upload
   const handleUpload = (jsonText: string) => {
     setJsonInput(jsonText);
+    setUploaderOpen(false);
+    toast({
+      title: "File Uploaded",
+      description: "Your JSON file has been loaded successfully"
+    });
+  };
+
+  // Handle setting changes
+  const handleSettingChange = <K extends keyof typeof settings>(
+    key: K,
+    value: typeof settings[K]
+  ) => {
+    switch (key) {
+      case 'indentation':
+        setIndentation(value as number);
+        break;
+      case 'autoUpdate':
+        setAutoUpdate(value as boolean);
+        break;
+      case 'colorMode':
+        setColorMode(value as "light" | "dark" | "system");
+        break;
+      case 'viewMode':
+        setViewMode(value as "code" | "tree");
+        break;
+    }
+  };
+
+  // Settings object for the dialog
+  const settings = {
+    indentation,
+    autoUpdate,
+    colorMode,
+    viewMode,
+  };
+
+  // Share JSON functionality
+  const handleShare = () => {
+    // In a real app, this could generate a shareable URL
+    toast({
+      title: "Share Feature",
+      description: "Shareable link feature would be implemented here"
+    });
   };
 
   // Determine if layout should be horizontal or vertical (for mobile)
@@ -299,7 +370,47 @@ const FormatterContainer: React.FC<FormatterContainerProps> = () => {
         isMinified={isMinified}
         isExpanded={isExpanded}
         onExpandToggle={() => setIsExpanded(!isExpanded)}
+        onSettingsOpen={() => setSettingsOpen(true)}
       />
+
+      <div className="flex items-center justify-between p-2 px-3 bg-muted/30">
+        <div className="flex items-center gap-2">
+          <Collapsible
+            open={uploaderOpen}
+            onOpenChange={setUploaderOpen}
+            className="w-full"
+          >
+            <CollapsibleTrigger asChild>
+              <Button variant="ghost" size="sm" className="flex items-center gap-1">
+                <Upload className="h-4 w-4 mr-1" />
+                Upload JSON
+                {uploaderOpen ? <ChevronUp className="h-3 w-3 ml-1" /> : <ChevronDown className="h-3 w-3 ml-1" />}
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="mt-2 p-2 bg-card rounded-md border shadow-sm">
+              <JsonUploader onUpload={handleUpload} className="h-32" />
+            </CollapsibleContent>
+          </Collapsible>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          {error && (
+            <div className="flex items-center text-xs text-destructive font-medium">
+              <FileWarning className="h-4 w-4 mr-1" />
+              Invalid JSON
+            </div>
+          )}
+          <Button
+            variant="ghost"
+            size="sm"
+            disabled={!isJsonValid}
+            onClick={handleShare}
+          >
+            <Share2 className="h-4 w-4 mr-1" />
+            Share
+          </Button>
+        </div>
+      </div>
       
       <div className="flex-1 overflow-hidden">
         <ResizablePanelGroup
@@ -317,7 +428,7 @@ const FormatterContainer: React.FC<FormatterContainerProps> = () => {
             </Card>
           </ResizablePanel>
           
-          <ResizableHandle />
+          <ResizableHandle withHandle />
           
           <ResizablePanel defaultSize={50} minSize={30}>
             <Card className="h-full border-0 rounded-none">
@@ -328,7 +439,7 @@ const FormatterContainer: React.FC<FormatterContainerProps> = () => {
                   readOnly={true}
                 />
               ) : (
-                <div className="h-full overflow-auto bg-background">
+                <div className="h-full overflow-auto bg-background p-2">
                   {parsedData && (
                     <JsonTreeView 
                       data={parsedData} 
@@ -341,6 +452,13 @@ const FormatterContainer: React.FC<FormatterContainerProps> = () => {
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>
+
+      <SettingsDialog
+        open={settingsOpen}
+        onOpenChange={setSettingsOpen}
+        settings={settings}
+        onSettingChange={handleSettingChange}
+      />
     </div>
   );
 };

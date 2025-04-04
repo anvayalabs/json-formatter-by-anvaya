@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ChevronDown, ChevronRight, Image as ImageIcon, Plus, Minus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { 
@@ -44,6 +44,11 @@ const JsonNode: React.FC<JsonNodeProps> = ({
   defaultExpanded 
 }) => {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+  const [isHovered, setIsHovered] = useState(false);
+
+  useEffect(() => {
+    setIsExpanded(defaultExpanded);
+  }, [defaultExpanded]);
 
   const getType = (value: any): string => {
     if (value === null) return "null";
@@ -64,15 +69,16 @@ const JsonNode: React.FC<JsonNodeProps> = ({
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <span className="text-[#F2FCE2] flex items-center gap-1 cursor-pointer">
-                    "{value}" <ImageIcon size={14} className="inline-block ml-1" />
+                  <span className="text-[#F2FCE2] flex items-center gap-1 cursor-pointer hover:underline">
+                    <span className="truncate max-w-[300px]">"{value}"</span>
+                    <ImageIcon size={14} className="inline-block ml-1" />
                   </span>
                 </TooltipTrigger>
-                <TooltipContent side="right" className="p-0">
+                <TooltipContent side="right" className="p-1 bg-background/80 backdrop-blur-md">
                   <img 
                     src={value} 
                     alt="Preview" 
-                    className="max-h-40 max-w-40 object-contain"
+                    className="max-h-40 max-w-40 object-contain rounded-md"
                     onError={(e) => {
                       (e.target as HTMLImageElement).style.display = 'none';
                     }}
@@ -96,14 +102,14 @@ const JsonNode: React.FC<JsonNodeProps> = ({
       
       case "object":
         return (
-          <span className="text-foreground">
+          <span className="text-muted-foreground text-xs">
             {"{}"} {Object.keys(value).length} {Object.keys(value).length === 1 ? "property" : "properties"}
           </span>
         );
       
       case "array":
         return (
-          <span className="text-foreground">
+          <span className="text-muted-foreground text-xs">
             {"[]"} {value.length} {value.length === 1 ? "item" : "items"}
           </span>
         );
@@ -123,7 +129,7 @@ const JsonNode: React.FC<JsonNodeProps> = ({
       
       if (isEmpty) {
         return (
-          <span className="ml-2">
+          <span className="ml-2 text-muted-foreground">
             {type === "object" ? "{}" : "[]"}
           </span>
         );
@@ -203,12 +209,19 @@ const JsonNode: React.FC<JsonNodeProps> = ({
   }
 
   return (
-    <div className={cn("py-1", { "pb-0": isExpanded && isExpandable && !isEmpty })}>
+    <div 
+      className={cn(
+        "py-1 transition-colors rounded-md",
+        isHovered && "bg-accent/40"
+      )}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <div className="flex items-start">
         {isExpandable && !isEmpty ? (
           <button 
             onClick={handleToggle}
-            className="mr-1 mt-0.5 p-0.5 hover:bg-muted rounded focus:outline-none"
+            className="mr-1 mt-0.5 p-0.5 hover:bg-muted rounded focus:outline-none focus:ring-1 focus:ring-primary/40 transition-colors"
           >
             {isExpanded ? (
               <Minus size={14} className="text-muted-foreground" />
@@ -226,7 +239,11 @@ const JsonNode: React.FC<JsonNodeProps> = ({
             {isExpandable ? (
               <span>
                 {!isExpanded && renderValue(data)}
-                {isExpanded && (getType(data) === "object" ? "{" : "[")}
+                {isExpanded && (
+                  <span className="text-foreground/70">
+                    {getType(data) === "object" ? "{" : "["}
+                  </span>
+                )}
               </span>
             ) : (
               renderValue(data)
@@ -236,7 +253,7 @@ const JsonNode: React.FC<JsonNodeProps> = ({
           {isExpanded && isExpandable && renderExpandableValue(data)}
           
           {isExpanded && isExpandable && !isEmpty && (
-            <div className="pl-6">
+            <div className="pl-6 text-foreground/70">
               {getType(data) === "object" ? "}" : "]"}
             </div>
           )}

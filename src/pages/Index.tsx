@@ -10,8 +10,10 @@ const Index: React.FC = () => {
       <main className="flex-1 overflow-hidden">
         <FormatterContainer />
       </main>
-      <footer className="text-center p-2 text-xs text-muted-foreground">
-        &copy; {new Date().getFullYear()} Anvaya Labs. All rights reserved.
+      <footer className="text-center p-3 text-xs bg-muted/30 border-t text-muted-foreground flex items-center justify-center gap-1">
+        <span>© {new Date().getFullYear()} Anvaya Labs</span>
+        <span className="w-1 h-1 rounded-full bg-muted-foreground/30" />
+        <span>An Interactive JSON Formatter & Validator</span>
       </footer>
     </div>
   );
