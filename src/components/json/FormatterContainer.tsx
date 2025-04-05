@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ChevronUp, ChevronDown, Share2, Upload, FileWarning, Copy, Check } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface FormatterContainerProps {
   // Add any props that might be needed in the future
@@ -100,6 +101,9 @@ const FormatterContainer: React.FC<FormatterContainerProps> = () => {
   const [highlightMatchingBrackets, setHighlightMatchingBrackets] = useLocalStorage<boolean>("json-formatter-highlight-matching", true);
 
   const { toast } = useToast();
+  
+  // Get mobile status from custom hook
+  const isMobile = useIsMobile();
   
   // Timer ref for auto-update delay
   const autoUpdateTimer = useRef<NodeJS.Timeout | null>(null);
@@ -545,9 +549,6 @@ const FormatterContainer: React.FC<FormatterContainerProps> = () => {
   
   // Hidden file input for settings import
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
-  // Determine if layout should be horizontal or vertical (for mobile)
-  const isMobile = window.innerWidth < 768;
 
   return (
     <div className="w-full h-full flex flex-col">
@@ -619,7 +620,11 @@ const FormatterContainer: React.FC<FormatterContainerProps> = () => {
           direction={isMobile ? "vertical" : "horizontal"}
           className="h-full"
         >
-          <ResizablePanel defaultSize={50} minSize={30}>
+          <ResizablePanel 
+            defaultSize={50} 
+            minSize={30}
+            className="min-h-[150px] md:min-h-0"
+          >
             <Card className="h-full border-0 rounded-none">
               <JsonEditor
                 value={jsonInput}
@@ -627,19 +632,25 @@ const FormatterContainer: React.FC<FormatterContainerProps> = () => {
                 error={error}
                 isLoading={isLoading}
                 preserveInput={true}
+                height={isMobile ? "300px" : "100%"}
               />
             </Card>
           </ResizablePanel>
           
           <ResizableHandle withHandle />
           
-          <ResizablePanel defaultSize={50} minSize={30}>
+          <ResizablePanel 
+            defaultSize={50} 
+            minSize={30}
+            className="min-h-[150px] md:min-h-0"
+          >
             <Card className="h-full border-0 rounded-none">
               {viewMode === "code" ? (
                 <JsonEditor 
                   value={jsonOutput} 
                   onChange={() => {}} 
                   readOnly={true}
+                  height={isMobile ? "300px" : "100%"}
                 />
               ) : (
                 <div className="h-full overflow-auto bg-background p-2">

@@ -51,11 +51,11 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
       base: 'vs-dark',
       inherit: true,
       colors: {
-        'editor.background': '#1e1e2e',
+        'editor.background': '#121212', // Darker background
         'editor.foreground': '#f8f8f2',
         'editorCursor.foreground': '#f8f8f2',
         'editor.selectionBackground': '#44475a',
-        'editor.lineHighlightBackground': '#2a2a3d',
+        'editor.lineHighlightBackground': '#1e1e2e',
         'editor.findMatchBackground': '#6272a4',
         'editor.findMatchHighlightBackground': '#6272a455',
         'editorLineNumber.foreground': '#565869',
@@ -78,8 +78,8 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
         { token: 'delimiter.colon', foreground: '#0EA5E9', fontStyle: 'bold' },
         { token: 'key', foreground: '#1EAEDB', fontStyle: 'bold' },
         { token: 'key.json', foreground: '#1EAEDB', fontStyle: 'bold' },
-        { token: 'boolean', foreground: '#9b87f5', fontStyle: 'bold' },
-        { token: 'null', foreground: '#8E9196', fontStyle: 'bold italic' },
+        { token: 'boolean', foreground: '#ff79c6', fontStyle: 'bold' }, // Brighter boolean
+        { token: 'null', foreground: '#bd93f9', fontStyle: 'bold italic' }, // Brighter null
       ]
     });
     
@@ -139,7 +139,13 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
   }, [error]);
 
   return (
-    <div className="relative w-full h-full">
+    <div className="relative w-full h-full flex flex-col">
+      {error && !isLoading && (
+        <div className="p-2 bg-destructive/90 text-destructive-foreground text-sm font-medium">
+          {error}
+        </div>
+      )}
+      
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-background/90 z-10">
           <div className="flex flex-col items-center gap-2">
@@ -148,37 +154,35 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
           </div>
         </div>
       )}
-      <Editor
-        height={height}
-        language="json"
-        theme={isDarkTheme ? "jsonDarkTheme" : "jsonLightTheme"}
-        value={value}
-        options={{
-          readOnly,
-          minimap: { enabled: false },
-          lineNumbers: "on",
-          scrollBeyondLastLine: false,
-          renderLineHighlight: "all",
-          fontFamily: "'JetBrains Mono', 'Fira Code', Menlo, Monaco, 'Courier New', monospace",
-          fontSize: 14,
-          wordWrap: "on",
-          automaticLayout: true,
-          formatOnPaste: preserveInput ? false : true,
-          tabSize: 2,
-          folding: true,
-          bracketPairColorization: {
-            enabled: true
-          },
-        }}
-        onChange={(value) => onChange(value || "")}
-        onMount={handleEditorDidMount}
-        loading={<Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />}
-      />
-      {error && !isLoading && (
-        <div className="absolute bottom-0 left-0 right-0 p-3 bg-destructive/80 backdrop-blur-sm text-destructive-foreground text-sm font-medium">
-          {error}
-        </div>
-      )}
+      
+      <div className="flex-1">
+        <Editor
+          height={height}
+          language="json"
+          theme={isDarkTheme ? "jsonDarkTheme" : "jsonLightTheme"}
+          value={value}
+          options={{
+            readOnly,
+            minimap: { enabled: false },
+            lineNumbers: "on",
+            scrollBeyondLastLine: false,
+            renderLineHighlight: "all",
+            fontFamily: "'JetBrains Mono', 'Fira Code', Menlo, Monaco, 'Courier New', monospace",
+            fontSize: 14,
+            wordWrap: "on",
+            automaticLayout: true,
+            formatOnPaste: preserveInput ? false : true,
+            tabSize: 2,
+            folding: true,
+            bracketPairColorization: {
+              enabled: true
+            },
+          }}
+          onChange={(value) => onChange(value || "")}
+          onMount={handleEditorDidMount}
+          loading={<Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />}
+        />
+      </div>
     </div>
   );
 };
