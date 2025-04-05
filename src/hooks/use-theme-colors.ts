@@ -85,7 +85,8 @@ export const useThemeColors = () => {
   
   // Helper to update a specific color in custom scheme
   const updateColor = (type: keyof Omit<JsonColorScheme, 'background'>, color: string) => {
-    setCustomColors(prev => {
+    // Fix: Explicitly type the update function to return JsonColorScheme
+    setCustomColors((prev: JsonColorScheme | null): JsonColorScheme => {
       const base = prev || {...defaultColorSchemes[activeScheme]};
       return {
         ...base,
@@ -96,7 +97,8 @@ export const useThemeColors = () => {
   
   // Helper to update the background color
   const updateBackgroundColor = (mode: 'light' | 'dark', color: string) => {
-    setCustomColors(prev => {
+    // Fix: Explicitly type the update function to return JsonColorScheme
+    setCustomColors((prev: JsonColorScheme | null): JsonColorScheme => {
       const base = prev || {...defaultColorSchemes[activeScheme]};
       return {
         ...base,
