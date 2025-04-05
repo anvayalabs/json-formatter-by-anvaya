@@ -46,12 +46,12 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
       editor.focus();
     }
     
-    // Setup custom theme for dark mode with more granular color scheme
+    // Setup custom theme for dark mode with brighter color scheme
     monaco.editor.defineTheme('jsonDarkTheme', {
       base: 'vs-dark',
       inherit: true,
       colors: {
-        'editor.background': '#121212', // Darker background
+        'editor.background': '#0a0a0a', // Darker background
         'editor.foreground': '#f8f8f2',
         'editorCursor.foreground': '#f8f8f2',
         'editor.selectionBackground': '#44475a',
@@ -66,24 +66,24 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
         'editorIndentGuide.activeBackground': '#444455'
       },
       rules: [
-        { token: 'string', foreground: '#a3be8c', fontStyle: 'italic' },
-        { token: 'string.key.json', foreground: '#1EAEDB', fontStyle: 'bold' },
-        { token: 'string.value.json', foreground: '#a3be8c', fontStyle: 'italic' },
-        { token: 'number', foreground: '#f97316', fontStyle: 'bold' },
-        { token: 'keyword', foreground: '#9b87f5', fontStyle: 'bold' },
+        { token: 'string', foreground: '#a3ffb0', fontStyle: 'italic' }, // Brighter green
+        { token: 'string.key.json', foreground: '#33C3F0', fontStyle: 'bold' }, // Brighter blue
+        { token: 'string.value.json', foreground: '#a3ffb0', fontStyle: 'italic' }, // Brighter green
+        { token: 'number', foreground: '#FF9F2D', fontStyle: 'bold' }, // Brighter orange
+        { token: 'keyword', foreground: '#D946EF', fontStyle: 'bold' }, // Magenta pink
         { token: 'delimiter', foreground: '#d4d4d4' },
-        { token: 'delimiter.bracket', foreground: '#7E69AB' },
-        { token: 'delimiter.array', foreground: '#7E69AB' },
+        { token: 'delimiter.bracket', foreground: '#8B5CF6' }, // Vivid purple
+        { token: 'delimiter.array', foreground: '#8B5CF6' }, // Vivid purple
         { token: 'delimiter.comma', foreground: '#888888' },
-        { token: 'delimiter.colon', foreground: '#0EA5E9', fontStyle: 'bold' },
-        { token: 'key', foreground: '#1EAEDB', fontStyle: 'bold' },
-        { token: 'key.json', foreground: '#1EAEDB', fontStyle: 'bold' },
-        { token: 'boolean', foreground: '#ff79c6', fontStyle: 'bold' }, // Brighter boolean
-        { token: 'null', foreground: '#bd93f9', fontStyle: 'bold italic' }, // Brighter null
+        { token: 'delimiter.colon', foreground: '#0EA5E9', fontStyle: 'bold' }, // Ocean blue
+        { token: 'key', foreground: '#33C3F0', fontStyle: 'bold' }, // Brighter blue
+        { token: 'key.json', foreground: '#33C3F0', fontStyle: 'bold' }, // Brighter blue
+        { token: 'boolean', foreground: '#D946EF', fontStyle: 'bold' }, // Magenta pink
+        { token: 'null', foreground: '#8B5CF6', fontStyle: 'bold italic' }, // Vivid purple
       ]
     });
     
-    // Setup custom theme for light mode with more granular color scheme
+    // Setup custom theme for light mode with brighter color scheme
     monaco.editor.defineTheme('jsonLightTheme', {
       base: 'vs',
       inherit: true,
@@ -103,20 +103,20 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
         'editorIndentGuide.activeBackground': '#cccccc'
       },
       rules: [
-        { token: 'string', foreground: '#388e3c', fontStyle: 'italic' },
-        { token: 'string.key.json', foreground: '#0277bd', fontStyle: 'bold' },
-        { token: 'string.value.json', foreground: '#388e3c', fontStyle: 'italic' },
-        { token: 'number', foreground: '#e65100', fontStyle: 'bold' },
-        { token: 'keyword', foreground: '#673ab7', fontStyle: 'bold' },
+        { token: 'string', foreground: '#10B981', fontStyle: 'italic' }, // Brighter green
+        { token: 'string.key.json', foreground: '#0EA5E9', fontStyle: 'bold' }, // Brighter blue
+        { token: 'string.value.json', foreground: '#10B981', fontStyle: 'italic' }, // Brighter green
+        { token: 'number', foreground: '#F97316', fontStyle: 'bold' }, // Brighter orange
+        { token: 'keyword', foreground: '#8B5CF6', fontStyle: 'bold' }, // Vivid purple
         { token: 'delimiter', foreground: '#546e7a' },
-        { token: 'delimiter.bracket', foreground: '#7E69AB' },
-        { token: 'delimiter.array', foreground: '#7E69AB' },
+        { token: 'delimiter.bracket', foreground: '#8B5CF6' }, // Vivid purple
+        { token: 'delimiter.array', foreground: '#8B5CF6' }, // Vivid purple
         { token: 'delimiter.comma', foreground: '#666666' },
-        { token: 'delimiter.colon', foreground: '#0277bd', fontStyle: 'bold' },
-        { token: 'key', foreground: '#0277bd', fontStyle: 'bold' },
-        { token: 'key.json', foreground: '#0277bd', fontStyle: 'bold' },
-        { token: 'boolean', foreground: '#673ab7', fontStyle: 'bold' },
-        { token: 'null', foreground: '#616161', fontStyle: 'bold italic' },
+        { token: 'delimiter.colon', foreground: '#0EA5E9', fontStyle: 'bold' }, // Ocean blue
+        { token: 'key', foreground: '#0EA5E9', fontStyle: 'bold' }, // Brighter blue
+        { token: 'key.json', foreground: '#0EA5E9', fontStyle: 'bold' }, // Brighter blue
+        { token: 'boolean', foreground: '#8B5CF6', fontStyle: 'bold' }, // Vivid purple
+        { token: 'null', foreground: '#6366F1', fontStyle: 'bold italic' }, // Brighter indigo
       ]
     });
     

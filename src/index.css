@@ -51,13 +51,13 @@
 
     --sidebar-ring: 217.2 91.2% 59.8%;
     
-    /* JSON editor colors */
+    /* JSON editor colors - brighter scheme */
     --json-editor-background: 0 0% 97%;
-    --json-key: 200 100% 50%;
-    --json-string: 120 70% 70%;
-    --json-number: 25 100% 50%;
-    --json-boolean: 280 80% 65%;
-    --json-null: 220 10% 55%;
+    --json-key: 200 100% 50%;  /* Brighter blue for keys */
+    --json-string: 120 70% 70%;  /* Brighter green for strings */
+    --json-number: 25 100% 50%;  /* Brighter orange for numbers */
+    --json-boolean: 280 80% 65%;  /* Brighter purple for booleans */
+    --json-null: 220 10% 55%;  /* Keep null more subdued */
   }
 
   .dark {
@@ -98,13 +98,13 @@
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
     
-    /* JSON editor dark mode colors - more contrasting */
-    --json-editor-background: 0 0% 7%;
-    --json-key: 200 75% 65%;
-    --json-string: 120 70% 70%; 
-    --json-number: 25 100% 65%;
-    --json-boolean: 300 90% 75%;
-    --json-null: 260 70% 75%;
+    /* JSON editor dark mode colors - more contrasting and brighter */
+    --json-editor-background: 0 0% 7%;  /* Darker background for better contrast */
+    --json-key: 200 75% 65%;  /* Bright blue for keys */
+    --json-string: 120 70% 70%;  /* Bright green for strings */
+    --json-number: 25 100% 65%;  /* Bright orange for numbers */
+    --json-boolean: 300 90% 75%;  /* Vibrant purple for booleans */
+    --json-null: 260 70% 75%;  /* Brighter purple for null */
   }
 }
 

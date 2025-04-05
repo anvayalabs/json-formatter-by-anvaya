@@ -63,17 +63,17 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Custom colors for JSON formatting
+				// Custom colors for JSON formatting with brighter colors
 				json: {
-					key: '#1EAEDB',
-					string: '#F2FCE2',
-					number: '#F97316',
-					boolean: '#9b87f5',
-					null: '#8E9196',
-					error: '#ea384c',
+					key: '#33C3F0',  // Bright blue
+					string: '#10B981', // Bright green
+					number: '#F97316', // Bright orange
+					boolean: '#8B5CF6', // Vivid purple
+					null: '#D946EF',   // Magenta pink
+					error: '#ea384c',  // Error red
 					background: {
-						dark: '#222222',
-						light: '#F1F1F1'
+						dark: '#0a0a0a', // Darker background
+						light: '#F1F1F1' // Light background
 					}
 				}
 			},
