@@ -15,6 +15,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useJsonFormatter } from "@/hooks/use-json-formatter";
 import { useSettingsManager } from "@/hooks/use-settings-manager";
 import { useShare } from "@/hooks/use-share";
+import { useThemeColors } from "@/hooks/use-theme-colors";
 
 interface FormatterContainerProps {
   // Add any props that might be needed in the future
@@ -61,6 +62,9 @@ const FormatterContainer: React.FC<FormatterContainerProps> = () => {
 
   // Get theme management
   const { theme: colorMode, setTheme: setColorMode } = useTheme();
+  
+  // Get theme colors
+  const { cssVariables } = useThemeColors();
   
   // Get mobile status from custom hook
   const isMobile = useIsMobile();
@@ -117,7 +121,7 @@ const FormatterContainer: React.FC<FormatterContainerProps> = () => {
   };
 
   return (
-    <div className="w-full h-full flex flex-col">
+    <div className="w-full h-full flex flex-col" style={cssVariables}>
       <FormatterToolbar
         onFormat={handleFormat}
         onMinify={handleMinify}

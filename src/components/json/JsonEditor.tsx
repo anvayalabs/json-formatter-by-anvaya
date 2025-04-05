@@ -3,6 +3,7 @@ import React, { useRef, useEffect } from "react";
 import Editor from "@monaco-editor/react";
 import { Loader2 } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
+import { useThemeColors } from "@/hooks/use-theme-colors";
 
 interface JsonEditorProps {
   value: string;
@@ -26,6 +27,7 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
   const editorRef = useRef<any>(null);
   const { theme } = useTheme();
   const isDarkTheme = theme === 'dark';
+  const { currentColorScheme: colors } = useThemeColors();
   
   const handleEditorDidMount = (editor: any, monaco: any) => {
     editorRef.current = editor;
@@ -46,12 +48,12 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
       editor.focus();
     }
     
-    // Setup custom theme for dark mode with brighter color scheme
+    // Setup custom theme for dark mode with user's color scheme
     monaco.editor.defineTheme('jsonDarkTheme', {
       base: 'vs-dark',
       inherit: true,
       colors: {
-        'editor.background': '#0a0a0a', // Darker background
+        'editor.background': colors.background.dark,
         'editor.foreground': '#f8f8f2',
         'editorCursor.foreground': '#f8f8f2',
         'editor.selectionBackground': '#44475a',
@@ -66,29 +68,29 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
         'editorIndentGuide.activeBackground': '#444455'
       },
       rules: [
-        { token: 'string', foreground: '#a3ffb0', fontStyle: 'italic' }, // Brighter green
-        { token: 'string.key.json', foreground: '#33C3F0', fontStyle: 'bold' }, // Brighter blue
-        { token: 'string.value.json', foreground: '#a3ffb0', fontStyle: 'italic' }, // Brighter green
-        { token: 'number', foreground: '#FF9F2D', fontStyle: 'bold' }, // Brighter orange
-        { token: 'keyword', foreground: '#D946EF', fontStyle: 'bold' }, // Magenta pink
+        { token: 'string', foreground: colors.string, fontStyle: 'italic' },
+        { token: 'string.key.json', foreground: colors.key, fontStyle: 'bold' },
+        { token: 'string.value.json', foreground: colors.string, fontStyle: 'italic' },
+        { token: 'number', foreground: colors.number, fontStyle: 'bold' },
+        { token: 'keyword', foreground: colors.boolean, fontStyle: 'bold' },
         { token: 'delimiter', foreground: '#d4d4d4' },
-        { token: 'delimiter.bracket', foreground: '#8B5CF6' }, // Vivid purple
-        { token: 'delimiter.array', foreground: '#8B5CF6' }, // Vivid purple
+        { token: 'delimiter.bracket', foreground: colors.key },
+        { token: 'delimiter.array', foreground: colors.key },
         { token: 'delimiter.comma', foreground: '#888888' },
-        { token: 'delimiter.colon', foreground: '#0EA5E9', fontStyle: 'bold' }, // Ocean blue
-        { token: 'key', foreground: '#33C3F0', fontStyle: 'bold' }, // Brighter blue
-        { token: 'key.json', foreground: '#33C3F0', fontStyle: 'bold' }, // Brighter blue
-        { token: 'boolean', foreground: '#D946EF', fontStyle: 'bold' }, // Magenta pink
-        { token: 'null', foreground: '#8B5CF6', fontStyle: 'bold italic' }, // Vivid purple
+        { token: 'delimiter.colon', foreground: colors.key, fontStyle: 'bold' },
+        { token: 'key', foreground: colors.key, fontStyle: 'bold' },
+        { token: 'key.json', foreground: colors.key, fontStyle: 'bold' },
+        { token: 'boolean', foreground: colors.boolean, fontStyle: 'bold' },
+        { token: 'null', foreground: colors.null, fontStyle: 'bold italic' },
       ]
     });
     
-    // Setup custom theme for light mode with brighter color scheme
+    // Setup custom theme for light mode with user's color scheme
     monaco.editor.defineTheme('jsonLightTheme', {
       base: 'vs',
       inherit: true,
       colors: {
-        'editor.background': '#f8f9fa',
+        'editor.background': colors.background.light,
         'editor.foreground': '#333333',
         'editorCursor.foreground': '#333333',
         'editor.selectionBackground': '#d1d1d1',
@@ -103,20 +105,20 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
         'editorIndentGuide.activeBackground': '#cccccc'
       },
       rules: [
-        { token: 'string', foreground: '#10B981', fontStyle: 'italic' }, // Brighter green
-        { token: 'string.key.json', foreground: '#0EA5E9', fontStyle: 'bold' }, // Brighter blue
-        { token: 'string.value.json', foreground: '#10B981', fontStyle: 'italic' }, // Brighter green
-        { token: 'number', foreground: '#F97316', fontStyle: 'bold' }, // Brighter orange
-        { token: 'keyword', foreground: '#8B5CF6', fontStyle: 'bold' }, // Vivid purple
+        { token: 'string', foreground: colors.string, fontStyle: 'italic' },
+        { token: 'string.key.json', foreground: colors.key, fontStyle: 'bold' },
+        { token: 'string.value.json', foreground: colors.string, fontStyle: 'italic' },
+        { token: 'number', foreground: colors.number, fontStyle: 'bold' },
+        { token: 'keyword', foreground: colors.boolean, fontStyle: 'bold' },
         { token: 'delimiter', foreground: '#546e7a' },
-        { token: 'delimiter.bracket', foreground: '#8B5CF6' }, // Vivid purple
-        { token: 'delimiter.array', foreground: '#8B5CF6' }, // Vivid purple
+        { token: 'delimiter.bracket', foreground: colors.key },
+        { token: 'delimiter.array', foreground: colors.key },
         { token: 'delimiter.comma', foreground: '#666666' },
-        { token: 'delimiter.colon', foreground: '#0EA5E9', fontStyle: 'bold' }, // Ocean blue
-        { token: 'key', foreground: '#0EA5E9', fontStyle: 'bold' }, // Brighter blue
-        { token: 'key.json', foreground: '#0EA5E9', fontStyle: 'bold' }, // Brighter blue
-        { token: 'boolean', foreground: '#8B5CF6', fontStyle: 'bold' }, // Vivid purple
-        { token: 'null', foreground: '#6366F1', fontStyle: 'bold italic' }, // Brighter indigo
+        { token: 'delimiter.colon', foreground: colors.key, fontStyle: 'bold' },
+        { token: 'key', foreground: colors.key, fontStyle: 'bold' },
+        { token: 'key.json', foreground: colors.key, fontStyle: 'bold' },
+        { token: 'boolean', foreground: colors.boolean, fontStyle: 'bold' },
+        { token: 'null', foreground: colors.null, fontStyle: 'bold italic' },
       ]
     });
     
@@ -129,14 +131,7 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
     if (editorRef.current && window.monaco) {
       window.monaco.editor.setTheme(isDarkTheme ? 'jsonDarkTheme' : 'jsonLightTheme');
     }
-  }, [theme, isDarkTheme]);
-
-  // Handle error highlighting
-  useEffect(() => {
-    if (editorRef.current && error) {
-      // In a future version, we could mark the exact location of the error
-    }
-  }, [error]);
+  }, [theme, isDarkTheme, colors]);
 
   return (
     <div className="relative w-full h-full flex flex-col">
