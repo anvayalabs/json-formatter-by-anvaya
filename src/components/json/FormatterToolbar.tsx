@@ -15,7 +15,7 @@ import {
   Trash2,
   Shrink,
   Expand,
-  LayoutGrid,
+  TreePine,
   Palette,
   FileCode,
   Minimize,
@@ -182,7 +182,7 @@ const FormatterToolbar: React.FC<FormatterToolbarProps> = ({
               onValueChange={(value) => onIndentationChange(parseInt(value))}
               disabled={isLoading || isMinified}
             >
-              <SelectTrigger className="w-[120px] h-8">
+              <SelectTrigger className="w-[130px] h-8">
                 <Indent className="h-4 w-4 mr-2" />
                 <SelectValue placeholder="Spaces" />
               </SelectTrigger>
@@ -246,7 +246,7 @@ const FormatterToolbar: React.FC<FormatterToolbarProps> = ({
                 onClick={() => onViewModeChange('tree')}
                 disabled={isLoading || !isJsonValid}
               >
-                <LayoutGrid className="h-4 w-4" />
+                <TreePine className="h-4 w-4" />
               </Button>
             </TooltipTrigger>
             <TooltipContent>Tree View</TooltipContent>

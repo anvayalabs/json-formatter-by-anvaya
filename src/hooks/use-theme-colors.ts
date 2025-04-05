@@ -98,6 +98,20 @@ export const useThemeColors = () => {
     setCurrentColorScheme(customColors || defaultColorSchemes[activeScheme]);
   }, [activeScheme, customColors]);
   
+  // Apply CSS variables to document root whenever the current scheme changes
+  useEffect(() => {
+    const root = document.documentElement;
+    root.style.setProperty('--json-key-color', currentColorScheme.key);
+    root.style.setProperty('--json-string-color', currentColorScheme.string);
+    root.style.setProperty('--json-number-color', currentColorScheme.number);
+    root.style.setProperty('--json-boolean-color', currentColorScheme.boolean);
+    root.style.setProperty('--json-null-color', currentColorScheme.null);
+    root.style.setProperty('--json-background-color', isDark
+      ? currentColorScheme.background.dark
+      : currentColorScheme.background.light
+    );
+  }, [currentColorScheme, isDark]);
+  
   // Helper to update a specific color in custom scheme
   const updateColor = (type: keyof Omit<JsonColorScheme, 'background'>, color: string) => {
     const base = customColors || {...defaultColorSchemes[activeScheme]};
