@@ -1,5 +1,7 @@
+
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { useTheme } from "@/hooks/use-theme";
+import { useState, useEffect } from "react";
 
 export interface JsonColorScheme {
   key: string;
@@ -10,7 +12,8 @@ export interface JsonColorScheme {
   background: {
     light: string;
     dark: string;
-  }
+  };
+  name?: string;
 }
 
 // Default color schemes
@@ -79,8 +82,21 @@ export const useThemeColors = () => {
     null
   );
   
-  // Get the current color scheme (either a preset or custom)
-  const currentColorScheme = customColors || defaultColorSchemes[activeScheme];
+  // Store saved custom schemes
+  const [savedSchemes, setSavedSchemes] = useLocalStorage<Record<string, JsonColorScheme>>(
+    'json-formatter-saved-schemes',
+    {}
+  );
+  
+  // State for current color scheme
+  const [currentColorScheme, setCurrentColorScheme] = useState<JsonColorScheme>(
+    customColors || defaultColorSchemes[activeScheme]
+  );
+  
+  // Update current scheme when activeScheme or customColors change
+  useEffect(() => {
+    setCurrentColorScheme(customColors || defaultColorSchemes[activeScheme]);
+  }, [activeScheme, customColors]);
   
   // Helper to update a specific color in custom scheme
   const updateColor = (type: keyof Omit<JsonColorScheme, 'background'>, color: string) => {
@@ -111,6 +127,35 @@ export const useThemeColors = () => {
     setCustomColors(null);
   };
   
+  // Save current custom scheme
+  const saveCustomScheme = (name: string) => {
+    if (!customColors) return;
+    
+    const schemeToSave = {
+      ...customColors,
+      name
+    };
+    
+    setSavedSchemes(prev => ({
+      ...prev,
+      [name]: schemeToSave
+    }));
+  };
+  
+  // Load a saved custom scheme
+  const loadSavedScheme = (name: string) => {
+    if (savedSchemes[name]) {
+      setCustomColors(savedSchemes[name]);
+    }
+  };
+  
+  // Delete a saved scheme
+  const deleteSavedScheme = (name: string) => {
+    const updatedSchemes = {...savedSchemes};
+    delete updatedSchemes[name];
+    setSavedSchemes(updatedSchemes);
+  };
+  
   // CSS variables for current theme
   const cssVariables = {
     '--json-key-color': currentColorScheme.key,
@@ -128,10 +173,14 @@ export const useThemeColors = () => {
     currentColorScheme,
     isCustom: !!customColors,
     cssVariables,
+    savedSchemes,
     setActiveScheme,
     updateColor,
     updateBackgroundColor,
     resetToPreset,
+    saveCustomScheme,
+    loadSavedScheme,
+    deleteSavedScheme,
     presets: defaultColorSchemes,
     isDark
   };

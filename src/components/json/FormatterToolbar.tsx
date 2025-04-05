@@ -8,7 +8,6 @@ import {
   FileJson,
   Loader2,
   Printer,
-  RefreshCw,
   Settings,
   Share2,
   Sun,
@@ -17,7 +16,11 @@ import {
   Shrink,
   Expand,
   LayoutGrid,
-  Palette
+  Palette,
+  FileCode,
+  Minimize,
+  Indent,
+  ToggleLeft
 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -87,7 +90,7 @@ const FormatterToolbar: React.FC<FormatterToolbarProps> = ({
                 disabled={isLoading}
                 onClick={onFormat}
               >
-                <Code className="h-4 w-4" />
+                <FileCode className="h-4 w-4" />
                 <span className="sr-only">Format</span>
               </Button>
             </TooltipTrigger>
@@ -102,7 +105,7 @@ const FormatterToolbar: React.FC<FormatterToolbarProps> = ({
                 disabled={isLoading}
                 onClick={onMinify}
               >
-                <Shrink className="h-4 w-4" />
+                <Minimize className="h-4 w-4" />
                 <span className="sr-only">Minify</span>
               </Button>
             </TooltipTrigger>
@@ -179,7 +182,8 @@ const FormatterToolbar: React.FC<FormatterToolbarProps> = ({
               onValueChange={(value) => onIndentationChange(parseInt(value))}
               disabled={isLoading || isMinified}
             >
-              <SelectTrigger className="w-[75px] h-8">
+              <SelectTrigger className="w-[120px] h-8">
+                <Indent className="h-4 w-4 mr-2" />
                 <SelectValue placeholder="Spaces" />
               </SelectTrigger>
               <SelectContent>
@@ -228,7 +232,7 @@ const FormatterToolbar: React.FC<FormatterToolbarProps> = ({
                 onClick={() => onViewModeChange('code')}
                 disabled={isLoading}
               >
-                <Code className="h-4 w-4" />
+                <FileCode className="h-4 w-4" />
               </Button>
             </TooltipTrigger>
             <TooltipContent>Code View</TooltipContent>

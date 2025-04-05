@@ -8,6 +8,7 @@ import {
   TooltipProvider,
   TooltipTrigger 
 } from "@/components/ui/tooltip";
+import { useThemeColors } from "@/hooks/use-theme-colors";
 
 interface JsonTreeViewProps {
   data: any;
@@ -15,6 +16,8 @@ interface JsonTreeViewProps {
 }
 
 const JsonTreeView: React.FC<JsonTreeViewProps> = ({ data, expandAll = false }) => {
+  const { currentColorScheme } = useThemeColors();
+
   return (
     <div className="p-2 font-mono text-sm overflow-auto">
       <JsonNode 
@@ -22,7 +25,8 @@ const JsonTreeView: React.FC<JsonTreeViewProps> = ({ data, expandAll = false }) 
         data={data} 
         isRoot={true} 
         level={0} 
-        defaultExpanded={expandAll} 
+        defaultExpanded={expandAll}
+        colorScheme={currentColorScheme}
       />
     </div>
   );
@@ -34,6 +38,7 @@ interface JsonNodeProps {
   isRoot?: boolean;
   level: number;
   defaultExpanded: boolean;
+  colorScheme: any;
 }
 
 const JsonNode: React.FC<JsonNodeProps> = ({ 
@@ -41,7 +46,8 @@ const JsonNode: React.FC<JsonNodeProps> = ({
   data, 
   isRoot = false, 
   level, 
-  defaultExpanded 
+  defaultExpanded,
+  colorScheme
 }) => {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const [isHovered, setIsHovered] = useState(false);
@@ -69,7 +75,7 @@ const JsonNode: React.FC<JsonNodeProps> = ({
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <span className="text-[#F2FCE2] flex items-center gap-1 cursor-pointer hover:underline">
+                  <span className="flex items-center gap-1 cursor-pointer hover:underline" style={{ color: colorScheme.string }}>
                     <span className="truncate max-w-[300px]">"{value}"</span>
                     <ImageIcon size={14} className="inline-block ml-1" />
                   </span>
@@ -89,16 +95,16 @@ const JsonNode: React.FC<JsonNodeProps> = ({
           );
         }
         
-        return <span className="text-[#F2FCE2]">"{value}"</span>;
+        return <span style={{ color: colorScheme.string }}>"{value}"</span>;
       
       case "number":
-        return <span className="text-[#F97316]">{value}</span>;
+        return <span style={{ color: colorScheme.number }}>{value}</span>;
       
       case "boolean":
-        return <span className="text-[#9b87f5]">{value.toString()}</span>;
+        return <span style={{ color: colorScheme.boolean }}>{value.toString()}</span>;
       
       case "null":
-        return <span className="text-[#8E9196]">null</span>;
+        return <span style={{ color: colorScheme.null }}>null</span>;
       
       case "object":
         return (
@@ -145,6 +151,7 @@ const JsonNode: React.FC<JsonNodeProps> = ({
                 data={value[key]}
                 level={level + 1}
                 defaultExpanded={defaultExpanded}
+                colorScheme={colorScheme}
               />
             ))
           }
@@ -156,6 +163,7 @@ const JsonNode: React.FC<JsonNodeProps> = ({
                 data={item}
                 level={level + 1}
                 defaultExpanded={defaultExpanded}
+                colorScheme={colorScheme}
               />
             ))
           }
@@ -190,6 +198,7 @@ const JsonNode: React.FC<JsonNodeProps> = ({
               data={data[key]}
               level={0}
               defaultExpanded={defaultExpanded}
+              colorScheme={colorScheme}
             />
           ))
         }
@@ -201,6 +210,7 @@ const JsonNode: React.FC<JsonNodeProps> = ({
               data={item}
               level={0}
               defaultExpanded={defaultExpanded}
+              colorScheme={colorScheme}
             />
           ))
         }
@@ -235,7 +245,7 @@ const JsonNode: React.FC<JsonNodeProps> = ({
         
         <div className="flex-1">
           <div className="flex items-center">
-            <span className="text-[#1EAEDB] mr-1">"{name}":</span> 
+            <span style={{ color: colorScheme.key }} className="mr-1">"{name}":</span> 
             {isExpandable ? (
               <span>
                 {!isExpanded && renderValue(data)}
