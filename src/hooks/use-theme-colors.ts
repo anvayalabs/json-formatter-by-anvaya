@@ -136,10 +136,13 @@ export const useThemeColors = () => {
       name
     };
     
-    setSavedSchemes(prev => ({
-      ...prev,
+    // Create a new object with the updated schemes instead of using a callback function
+    const updatedSavedSchemes = {
+      ...savedSchemes,
       [name]: schemeToSave
-    }));
+    };
+    
+    setSavedSchemes(updatedSavedSchemes);
   };
   
   // Load a saved custom scheme
@@ -151,7 +154,8 @@ export const useThemeColors = () => {
   
   // Delete a saved scheme
   const deleteSavedScheme = (name: string) => {
-    const updatedSchemes = {...savedSchemes};
+    // Create a new object without the scheme to delete instead of using a callback function
+    const updatedSchemes = { ...savedSchemes };
     delete updatedSchemes[name];
     setSavedSchemes(updatedSchemes);
   };
