@@ -25,7 +25,7 @@ interface FormatterContainerProps {
 interface SettingsType {
   indentation: number;
   autoUpdate: boolean;
-  colorMode: 'light' | 'dark' | 'system';
+  colorMode: 'light' | 'dark';
   viewMode: 'code' | 'tree';
   preserveWhitespace: boolean;
   sortKeys: boolean;
@@ -390,7 +390,7 @@ const FormatterContainer: React.FC<FormatterContainerProps> = () => {
       const settingsToExport: ExportedSettings = {
         indentation,
         autoUpdate,
-        colorMode: colorMode as 'light' | 'dark' | 'system',
+        colorMode: colorMode as 'light' | 'dark',
         viewMode,
         preserveWhitespace,
         sortKeys,
@@ -440,7 +440,7 @@ const FormatterContainer: React.FC<FormatterContainerProps> = () => {
           // Update all settings
           setIndentation(importedSettings.indentation || 2);
           setAutoUpdate(importedSettings.autoUpdate ?? true);
-          setColorMode(importedSettings.colorMode || 'system');
+          setColorMode(importedSettings.colorMode || 'dark');
           setViewMode(importedSettings.viewMode || 'code');
           setPreserveWhitespace(importedSettings.preserveWhitespace ?? false);
           setSortKeys(importedSettings.sortKeys ?? false);
@@ -507,7 +507,7 @@ const FormatterContainer: React.FC<FormatterContainerProps> = () => {
         setAutoUpdate(value as boolean);
         break;
       case 'colorMode':
-        setColorMode(value as "light" | "dark" | "system");
+        setColorMode(value as "light" | "dark");
         break;
       case 'viewMode':
         setViewMode(value as "code" | "tree");
@@ -534,7 +534,7 @@ const FormatterContainer: React.FC<FormatterContainerProps> = () => {
   const settings: SettingsType = {
     indentation,
     autoUpdate,
-    colorMode: colorMode as 'light' | 'dark' | 'system',
+    colorMode: colorMode as 'light' | 'dark',
     viewMode,
     preserveWhitespace,
     sortKeys,
@@ -566,7 +566,7 @@ const FormatterContainer: React.FC<FormatterContainerProps> = () => {
         autoUpdate={autoUpdate}
         onAutoUpdateChange={setAutoUpdate}
         isJsonValid={isJsonValid}
-        colorMode={colorMode as 'light' | 'dark' | 'system'}
+        colorMode={colorMode}
         onColorModeChange={setColorMode}
         isMinified={isMinified}
         isExpanded={isExpanded}

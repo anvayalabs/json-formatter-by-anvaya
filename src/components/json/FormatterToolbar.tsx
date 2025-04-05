@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { 
   Code, 
@@ -45,8 +46,8 @@ interface FormatterToolbarProps {
   autoUpdate: boolean;
   onAutoUpdateChange: (value: boolean) => void;
   isJsonValid: boolean;
-  colorMode: "light" | "dark" | "system";
-  onColorModeChange: (mode: "light" | "dark" | "system") => void;
+  colorMode: "light" | "dark";
+  onColorModeChange: (mode: "light" | "dark") => void;
   isMinified: boolean;
   isExpanded: boolean;
   onExpandToggle: () => void;
